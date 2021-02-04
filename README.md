@@ -1,6 +1,7 @@
-### Review of peerjs based on
-https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Build_a_phone_with_peerjs
+### Audio call via WebRTC
 
+See also:
+https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Build_a_phone_with_peerjs
 
 Install and run peer server:
 cd ../peerjs-server
@@ -9,10 +10,10 @@ npm i
 npm start
 ```
 
-Run dev sever:
+Install and rundev sever:
 ```
-cd ../web-phone
-npx http-server -p 3000
+cd ../dev-server
+npm start
 ```
 
 Open two separate browser windows:
