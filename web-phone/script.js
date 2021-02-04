@@ -1,18 +1,23 @@
 const localCode = document.querySelector("#local-code");
 const remoteCode = document.querySelector("#remote-code");
-const btnCall = document.querySelector("#btn-call");
-const btnHangup = document.querySelector("#btn-hangup");
-const audio = document.querySelector("#audio");
 const status = document.querySelector("#status");
+// const btnCall = document.querySelector("#btn-call");
+// const btnHangup = document.querySelector("#btn-hangup");
+// const audio = document.querySelector("#audio");
+
+const audio = new Audio();
+audio.autoplay = true;
+
+remoteCode.focus();
 
 let localStream;
 
 // Open connection with peer serwer (ws protocol)
 const peer = new Peer(
   Math.random().toString(36).substr(2, 4).toUpperCase(), {
-  host: location.hostname,
-  port: 9000,
-  path: '/web-phone',
+  // host: location.hostname,
+  // port: 9000,
+  // path: '/web-phone',
   debug: 2
 });
 
@@ -28,10 +33,10 @@ navigator.mediaDevices.getUserMedia({ video: false, audio: true })
   .then(stream => {
     localStream = stream;
   }).catch(err => {
-    console.error(err);
+    status.value = err.message;
   });
 
-btnCall.addEventListener("click", () => {
+function onCall() {
   const rmCode = remoteCode.value;
 
   if (!rmCode) {
@@ -45,10 +50,23 @@ btnCall.addEventListener("click", () => {
     status.value = "Connected";
     audio.srcObject = stream;
   });
-});
+}
 
-btnHangup.addEventListener("click", () => {
+function onHangup() {
   peer.destroy();
+}
+
+// btnCall.addEventListener("click", onCall);
+// btnHangup.addEventListener("click", onHangup);
+
+document.addEventListener("keydown", event => {
+  switch (event.key) {
+    case "Enter":
+      status.value === "Connected" ? onHangup() : onCall();
+      return;
+    default:
+      return;
+  }
 });
 
 peer.on('call', mediaConnection => {
