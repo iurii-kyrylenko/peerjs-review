@@ -4,13 +4,13 @@ See also:
 https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Build_a_phone_with_peerjs
 
 #### Install and run peer server:
-cd ../peerjs-server
 ```
+cd ../peerjs-server
 npm i
 npm start
 ```
 
-#### Install and rundev sever:
+#### Install and run dev sever:
 ```
 cd ../dev-server
 npm start
@@ -21,7 +21,7 @@ npm start
 http://127.0.0.1:3000/
 ```
 
-Sometimes:
+Sometimes getting:
 ```
 peerjs-1.3.1.min.js:48 ERROR PeerJS:
 Error: (InvalidStateError) Failed to execute 'setRemoteDescription' on 'RTCPeerConnection':
