@@ -1,0 +1,14 @@
+{
+  "name": "peerjs-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "peerjs --port 9000 --path /web-phone"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "peer": "^0.6.1"
+  }
+}
