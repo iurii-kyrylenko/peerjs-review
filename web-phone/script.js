@@ -14,21 +14,23 @@ let localStream;
 
 // Open connection with peer serwer (ws protocol)
 const peer = new Peer(
-  Math.random().toString(36).substr(2, 4).toUpperCase(), {
-  // host: location.hostname,
-  // port: 9000,
-  // path: '/web-phone',
-  debug: 2
-});
+  Math.random().toString(36).substr(2, 4).toUpperCase(),
+  {
+    // host: location.hostname,
+    // port: 9000,
+    // path: "/web-phone",
+    debug: 2
+  }
+);
 
 // Display local code after connection with peer server
 peer.on("open", id => localCode.value = peer.id);
 
-peer.on('error', err => status.value = err.message);
+peer.on("error", err => status.value = err.message);
 
 peer.on("close", () => status.value = "Finished");
 
-// Get local strem
+// Get local stream
 navigator.mediaDevices.getUserMedia({ video: false, audio: true })
   .then(stream => {
     localStream = stream;
@@ -44,8 +46,11 @@ function onCall() {
     return;
   }
 
-  const mediaConnection = peer.call(rmCode, localStream);
+  // We use data channel to detect remote hangup
+  const dataConnection = peer.connect(rmCode);
+  dataConnection.on("close", () => peer.destroy());
 
+  const mediaConnection = peer.call(rmCode, localStream);
   mediaConnection.on("stream", stream => {
     status.value = "Connected";
     audio.srcObject = stream;
@@ -69,10 +74,15 @@ document.addEventListener("keydown", event => {
   }
 });
 
-peer.on('call', mediaConnection => {
+// We use data channel to detect remote hangup
+peer.on("connection", dataConnection => {
+  dataConnection.on("close", () => peer.destroy());
+});
+
+peer.on("call", mediaConnection => {
   mediaConnection.answer(localStream);
 
-  mediaConnection.on('stream', stream => {
+  mediaConnection.on("stream", stream => {
     status.value = "Connected";
     audio.srcObject = stream;
   });
