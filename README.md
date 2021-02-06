@@ -21,9 +21,7 @@ npm start
 http://127.0.0.1:3000/
 ```
 
-Sometimes getting:
+#### Get peer list from local peer server
 ```
-peerjs-1.3.1.min.js:48 ERROR PeerJS:
-Error: (InvalidStateError) Failed to execute 'setRemoteDescription' on 'RTCPeerConnection':
-Failed to set remote answer sdp: Called in wrong state: stable
+http://127.0.0.1:9000/web-phone/peerjs/peers
 ```

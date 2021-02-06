@@ -1,16 +1,11 @@
 const localCode = document.querySelector("#local-code");
 const remoteCode = document.querySelector("#remote-code");
 const status = document.querySelector("#status");
-// const btnCall = document.querySelector("#btn-call");
-// const btnHangup = document.querySelector("#btn-hangup");
-// const audio = document.querySelector("#audio");
 
 const audio = new Audio();
 audio.autoplay = true;
 
 remoteCode.focus();
-
-let localStream;
 
 // Open connection with peer serwer (ws protocol)
 const peer = new Peer(
@@ -23,6 +18,30 @@ const peer = new Peer(
   }
 );
 
+// Get local stream
+let localStream;
+
+navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+  .then(stream => {
+    localStream = stream;
+  }).catch(err => {
+    status.value = err.message;
+  });
+
+
+// We use data channel to detect remote hangup
+let dataConnection;
+
+function setDataConnection(connection) {
+  dataConnection = connection;
+  dataConnection.on("data", data => {
+    if (data === "HANGUP") {
+      dataConnection.close();
+      peer.destroy();
+    }
+  });
+}
+
 // Display local code after connection with peer server
 peer.on("open", id => localCode.value = peer.id);
 
@@ -30,13 +49,17 @@ peer.on("error", err => status.value = err.message);
 
 peer.on("close", () => status.value = "Finished");
 
-// Get local stream
-navigator.mediaDevices.getUserMedia({ video: false, audio: true })
-  .then(stream => {
-    localStream = stream;
-  }).catch(err => {
-    status.value = err.message;
+peer.on("connection", setDataConnection);
+
+peer.on("call", mediaConnection => {
+  mediaConnection.answer(localStream);
+
+  mediaConnection.on("stream", stream => {
+    status.value = "Connected";
+    remoteCode.value = mediaConnection.peer;
+    audio.srcObject = stream;
   });
+});
 
 function onCall() {
   const rmCode = remoteCode.value;
@@ -46,9 +69,7 @@ function onCall() {
     return;
   }
 
-  // We use data channel to detect remote hangup
-  const dataConnection = peer.connect(rmCode);
-  dataConnection.on("close", () => peer.destroy());
+  setDataConnection(peer.connect(rmCode));
 
   const mediaConnection = peer.call(rmCode, localStream);
   mediaConnection.on("stream", stream => {
@@ -58,11 +79,15 @@ function onCall() {
 }
 
 function onHangup() {
-  peer.destroy();
-}
+  dataConnection.send("HANGUP");
 
-// btnCall.addEventListener("click", onCall);
-// btnHangup.addEventListener("click", onHangup);
+  const timer = setInterval(() => {
+    if (!dataConnection.open) {
+      clearInterval(timer);
+      peer.destroy();
+    }
+  }, 500);
+}
 
 document.addEventListener("keydown", event => {
   switch (event.key) {
@@ -72,18 +97,4 @@ document.addEventListener("keydown", event => {
     default:
       return;
   }
-});
-
-// We use data channel to detect remote hangup
-peer.on("connection", dataConnection => {
-  dataConnection.on("close", () => peer.destroy());
-});
-
-peer.on("call", mediaConnection => {
-  mediaConnection.answer(localStream);
-
-  mediaConnection.on("stream", stream => {
-    status.value = "Connected";
-    audio.srcObject = stream;
-  });
 });
