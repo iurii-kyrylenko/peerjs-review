@@ -28,7 +28,7 @@ peer.on('error', err => status.value = err.message);
 
 peer.on("close", () => status.value = "Finished");
 
-// Get local strem
+// Get local stream
 navigator.mediaDevices.getUserMedia({ video: false, audio: true })
   .then(stream => {
     localStream = stream;
