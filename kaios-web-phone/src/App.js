@@ -1,72 +1,20 @@
-import React, { useState, useReducer, useEffect } from "react";
+import { useState, useReducer, useEffect } from "react";
 import { Header, InputForm, EmptyForm, Info, Softkeys } from "./components";
 import { createPeer, destroyPeer, callPear } from "./peer-service";
-
-const reducer = (state, action) => {
-  switch (action.type) {
-    case "LISTEN":
-      return {
-        ...state,
-        me: action.data,
-        status: "Listening"
-      };
-    case "CONNECT":
-      return {
-        ...state,
-        contact: action.data,
-        status: "Conversation"
-      };
-    case "REGISTER":
-      return {
-        ...state,
-        me: "",
-        contact: "",
-        status: "Registration"
-      };
-    case "MESSAGE":
-      return {
-        ...state,
-        message: action.data
-      }
-    default:
-      return;
-  }
-};
-
-const refs = {
-  Registration: React.createRef(),
-  Listening: React.createRef(),
-  Conversation: React.createRef()
-};
-
-const getSoftKeyProps = status => {
-  const map = {
-    Registration: { left: null, center: "LISTEN", right: "Clear" },
-    Listening: { left: "Register", center: "CONNECT", right: "Clear" },
-    Conversation: { left: null, center: "TERMINATE", right: null }
-  };
-
-  return map[status];
-};
-
-const getAudio = () => {
-  const audio = new Audio();
-  audio.autoplay = true;
-  return audio;
-}
+import * as u from "./utils";
 
 const App = () => {
-  const [audio] = useState(getAudio());
+  const [audio] = useState(u.getAudio());
 
-  const[state, dispatch] = useReducer(reducer, {
+  const[state, dispatch] = useReducer(u.reducer, {
     status: "Registration", 
     me: "",
     contact: "",
-    message: "[empty]"
+    error: ""
   });
 
-  useEffect(
-    () => refs[state.status].current.focus()
+  useEffect(() =>
+    u.refs[state.status].current.focus()
   );
 
   const handleListen = id => {
@@ -78,7 +26,7 @@ const App = () => {
         dispatch({ type: "REGISTER" });
       },
       error(e) {
-        dispatch({ type: "MESSAGE", data: e.message });
+        dispatch({ type: "ERROR", data: e.message });
       },
       stream(remoteStream, rmCode) {
         audio.srcObject = remoteStream;
@@ -96,30 +44,33 @@ const App = () => {
     });
   };
 
-  const handleRegister = () => {
-    destroyPeer();
-  };
+  const handleRegister = () =>  destroyPeer();
 
   return (
     <div>
       <Header title={state.status} />
       <InputForm
-        ref={refs.Registration}
+        ref={u.refs.Registration}
         label="Me"
         onSubmit={handleListen}
+        isActive={state.status === "Registration"}
+        code={state.me}
       />
       <InputForm
-        ref={refs.Listening}
+        ref={u.refs.Listening}
         label="Contact"
         onSubmit={handleConnect}
         onSoftLeft={handleRegister}
+        isActive={state.status === "Listening"}
+        code={state.contact}
       />
       <EmptyForm
-        ref={refs.Conversation}
+        ref={u.refs.Conversation}
         onSubmit={handleRegister}
       />
-      <Info message={state.message} />
-      <Softkeys {...getSoftKeyProps(state.status)} />
+      <Info message={u.getInfo(state.status)} />
+      <Info isError={true} message={state.error} />
+      <Softkeys {...u.getSoftKeyProps(state.status)} />
     </div>
   );
 }

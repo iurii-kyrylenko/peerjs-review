@@ -1,6 +1,8 @@
 import React, { useState } from "react"
 
-const InputForm = React.forwardRef(({ label, onSubmit, onSoftLeft }, ref) => {
+const InputForm = React.forwardRef((props, ref) => {
+  const { label, onSubmit, onSoftLeft, isActive, code } = props;
+
   const [value, setValue] = useState("");
 
   const handleChange = event => {
@@ -28,17 +30,23 @@ const InputForm = React.forwardRef(({ label, onSubmit, onSoftLeft }, ref) => {
     event.preventDefault();
   };
 
+  const input = (
+    <input
+      ref={ref}
+      type="text"
+      value={value}
+      onChange={handleChange}
+      onKeyDown={handleKey}
+    />
+  );
+
+  const id = (<span>{code}</span>);
+
   return (
     <form onSubmit={handleSubmit}>
       <label>
-        {label}
-        <input
-          ref={ref}
-          type="text"
-          value={value}
-          onChange={handleChange}
-          onKeyDown={handleKey}
-        />
+        {label}{": "}
+        {isActive ? input : id}
       </label>
     </form>
   );

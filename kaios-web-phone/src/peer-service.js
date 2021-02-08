@@ -6,7 +6,7 @@ let localStream = null;
 export function createPeer(code, cb) {
   navigator.mediaDevices.getUserMedia({ video: false, audio: true })
     .then(stream => localStream = stream)
-    .catch(err => cb(err.message));
+    .catch(err => cb(err));
 
   peer = new Peer(
     code, {
