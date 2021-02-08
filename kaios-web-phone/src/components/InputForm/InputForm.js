@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 
-const InputForm = React.forwardRef(({ label, input, onSubmit, onSoftLeft }, ref) => {
-  const [value, setValue] = useState(input);
+const InputForm = React.forwardRef(({ label, onSubmit, onSoftLeft }, ref) => {
+  const [value, setValue] = useState("");
 
   const handleChange = event => {
     setValue(event.target.value);
