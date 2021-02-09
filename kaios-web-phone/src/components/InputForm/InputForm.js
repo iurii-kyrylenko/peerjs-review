@@ -12,9 +12,11 @@ const InputForm = React.forwardRef((props, ref) => {
   const handleKey = event => {
     switch (event.key) {
       case "ArrowRight":
+      // case "SoftRight":
         setValue("");
         return;
       case "ArrowLeft":
+      // case "SoftLeft":
         onSoftLeft && onSoftLeft();
         return;
       default:

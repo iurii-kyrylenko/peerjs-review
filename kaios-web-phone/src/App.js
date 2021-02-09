@@ -23,10 +23,11 @@ const App = () => {
         dispatch({ type: "LISTEN", data: id });
       },
       close() {
+        audio.srcObject = null;
         dispatch({ type: "REGISTER" });
       },
-      error(e) {
-        dispatch({ type: "ERROR", data: e.message });
+      error(err) {
+        dispatch({ type: "ERROR", data: err.message });
       },
       stream(remoteStream, rmCode) {
         audio.srcObject = remoteStream;
@@ -40,6 +41,9 @@ const App = () => {
       stream(remoteStream) {
         audio.srcObject = remoteStream;
         dispatch({ type: "CONNECT", data: id });
+      },
+      timeout() {
+        dispatch({ type: "ERROR", data: "Сontact is probably busy" });
       }
     });
   };
