@@ -26,7 +26,7 @@ http://127.0.0.1:3000/
 http://127.0.0.1:9000/web-phone/peerjs/peers
 ```
 
-### Build React application
+#### Build React application
 ```
 GENERATE_SOURCEMAP=false yarn build
 ```
