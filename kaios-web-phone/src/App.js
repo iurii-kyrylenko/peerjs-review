@@ -10,14 +10,16 @@ const App = () => {
     status: "Registration", 
     me: "",
     contact: "",
-    error: ""
+    message: ""
   });
 
   useEffect(() =>
     u.refs[state.status].current.focus()
   );
 
-  const handleListen = id => {
+  const handleJoin = id => {
+    dispatch({ type: "MESSAGE", data: "Wait, please!" });
+
     createPeer(id, {
       open(id) {
         dispatch({ type: "LISTEN", data: id });
@@ -27,7 +29,7 @@ const App = () => {
         dispatch({ type: "REGISTER" });
       },
       error(err) {
-        dispatch({ type: "ERROR", data: err.message });
+        dispatch({ type: "MESSAGE", data: err.message });
       },
       stream(remoteStream, rmCode) {
         audio.srcObject = remoteStream;
@@ -37,18 +39,28 @@ const App = () => {
   };
 
   const handleConnect = id => {
+    if (id === state.me) {
+      dispatch({ type: "MESSAGE", data: "Cannot connect to myself" });
+      return;
+    }
+
+    dispatch({ type: "MESSAGE", data: "Wait, please!" });
+
     callPear(id, {
       stream(remoteStream) {
         audio.srcObject = remoteStream;
         dispatch({ type: "CONNECT", data: id });
       },
       timeout() {
-        dispatch({ type: "ERROR", data: "Сontact is probably busy" });
+        dispatch({ type: "MESSAGE", data: `Could not connect to peer ${id}` });
       }
     });
   };
 
-  const handleRegister = () =>  destroyPeer();
+  const handleLeave = () =>  {
+    dispatch({ type: "MESSAGE", data:  "" });
+    destroyPeer();
+  }
 
   return (
     <div>
@@ -56,7 +68,7 @@ const App = () => {
       <InputForm
         ref={u.refs.Registration}
         label="Me"
-        onSubmit={handleListen}
+        onSubmit={handleJoin}
         isActive={state.status === "Registration"}
         code={state.me}
       />
@@ -64,16 +76,16 @@ const App = () => {
         ref={u.refs.Listening}
         label="Contact"
         onSubmit={handleConnect}
-        onSoftLeft={handleRegister}
+        onSoftLeft={handleLeave}
         isActive={state.status === "Listening"}
         code={state.contact}
       />
       <EmptyForm
         ref={u.refs.Conversation}
-        onSubmit={handleRegister}
+        onSubmit={handleLeave}
       />
-      <Info message={u.getInfo(state.status)} />
-      <Info isError={true} message={state.error} />
+      <Info text={u.getInfo(state.status)} />
+      <Info text={state.message} isMessage={true} />
       <Softkeys {...u.getSoftKeyProps(state.status)} />
     </div>
   );

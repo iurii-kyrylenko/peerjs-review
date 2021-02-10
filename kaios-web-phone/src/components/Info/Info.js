@@ -1,11 +1,11 @@
 import React from "react"
 
-const Info = ({ message, isError }) => {
-  const style = isError ? { color: "red" } : {};
+const Info = ({ text, isMessage }) => {
+  const style = isMessage ? { color: "red" } : {};
 
   return (
     <div>
-      <span style={style}>{message}</span>
+      <span style={style}>{text}</span>
     </div>
   );
 };

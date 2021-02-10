@@ -7,26 +7,26 @@ export const reducer = (state, action) => {
         ...state,
         me: action.data,
         status: "Listening",
-        error: ""
+        message: ""
       };
     case "CONNECT":
       return {
         ...state,
         contact: action.data,
         status: "Conversation",
-        error: ""
+        message: ""
       };
     case "REGISTER":
       return {
         ...state,
         me: "",
         contact: "",
-        status: "Registration",
+        status: "Registration"
       };
-    case "ERROR":
+    case "MESSAGE":
       return {
         ...state,
-        error: action.data
+        message: action.data
       }
     default:
       return;
@@ -41,8 +41,8 @@ export const refs = {
 
 export const getSoftKeyProps = status => {
   const map = {
-    Registration: { left: null, center: "LISTEN", right: "Clear" },
-    Listening: { left: "Register", center: "CONNECT", right: "Clear" },
+    Registration: { left: null, center: "JOIN", right: "Clear" },
+    Listening: { left: "Leave", center: "CONNECT", right: "Clear" },
     Conversation: { left: null, center: "TERMINATE", right: null }
   };
   return map[status];
@@ -51,7 +51,7 @@ export const getSoftKeyProps = status => {
 export const getInfo = status => {
   const map = {
     Registration: "Please, input your code.",
-    Listening: "Wait for conversation or connect to yor contact.",
+    Listening: "Wait for conversation or connect to your contact.",
     Conversation: "Talk to contact."
   };
   return map[status];

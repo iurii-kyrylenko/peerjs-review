@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+import React, { useState } from "react";
+import { keys } from "../../config";
 
 const InputForm = React.forwardRef((props, ref) => {
   const { label, onSubmit, onSoftLeft, isActive, code } = props;
@@ -11,12 +12,10 @@ const InputForm = React.forwardRef((props, ref) => {
 
   const handleKey = event => {
     switch (event.key) {
-      case "ArrowRight":
-      // case "SoftRight":
+      case keys.right:
         setValue("");
         return;
-      case "ArrowLeft":
-      // case "SoftLeft":
+      case keys.left:
         onSoftLeft && onSoftLeft();
         return;
       default:
